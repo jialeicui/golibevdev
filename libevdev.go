@@ -6,6 +6,7 @@ import "C"
 import (
 	"fmt"
 	"os"
+	"time"
 )
 
 type InputDev struct {
@@ -61,8 +62,10 @@ func (dev *InputDev) HasEventCode(typ EventType, code KeyEventCode) bool {
 	return C.libevdev_has_event_code(dev.cStruct, C.uint(typ), C.uint(code)) == 1
 }
 
+// Event is a struct that represents an event from the input device.
+// https://www.kernel.org/doc/html/v4.18/input/input.html#event-interface
 type Event struct {
-	Time  int64
+	Time  time.Time
 	Type  EventType
 	Code  EventCode
 	Value int32
@@ -113,7 +116,7 @@ func (dev *InputDev) NextEvent(flag ReadFlag) (Event, error) {
 	}
 
 	return Event{
-		Time:  int64(ev.time.tv_sec),
+		Time:  time.Unix(int64(ev.time.tv_sec), int64(ev.time.tv_usec*1000)),
 		Type:  EventType(ev._type),
 		Code:  code,
 		Value: int32(ev.value),
