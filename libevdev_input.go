@@ -42,7 +42,6 @@ func NewVirtualKeyboard(name string) (uid *UInputDev, err error) {
 	var uidev *C.struct_libevdev_uinput
 	rc := C.libevdev_uinput_create_from_device(dev, C.LIBEVDEV_UINPUT_OPEN_MANAGED, &uidev)
 	if rc != 0 {
-		C.libevdev_free(dev)
 		return nil, fmt.Errorf("failed to create uinput device: %v", strError(rc))
 	}
 
