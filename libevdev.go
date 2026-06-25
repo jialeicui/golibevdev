@@ -80,11 +80,23 @@ const (
 	ReadFlagGetRepeat ReadFlag = 8
 )
 
+type ReadStatus int
+
+const (
+	ReadStatusSuccess ReadStatus = C.LIBEVDEV_READ_STATUS_SUCCESS
+	ReadStatusSync    ReadStatus = C.LIBEVDEV_READ_STATUS_SYNC
+)
+
 func (dev *InputDev) NextEvent(flag ReadFlag) (Event, error) {
+	ev, _, err := dev.NextEventWithStatus(flag)
+	return ev, err
+}
+
+func (dev *InputDev) NextEventWithStatus(flag ReadFlag) (Event, ReadStatus, error) {
 	var ev C.struct_input_event
 	rc := C.libevdev_next_event(dev.cStruct, C.uint(flag), &ev)
-	if rc != 0 {
-		return Event{}, fmt.Errorf("failed to get next event: %v", strError(rc))
+	if rc < 0 {
+		return Event{}, ReadStatus(rc), fmt.Errorf("failed to get next event: %v", strError(rc))
 	}
 
 	var code EventCode
@@ -120,7 +132,7 @@ func (dev *InputDev) NextEvent(flag ReadFlag) (Event, error) {
 		Type:  EventType(ev._type),
 		Code:  code,
 		Value: int32(ev.value),
-	}, nil
+	}, ReadStatus(rc), nil
 }
 
 func (dev *InputDev) Grab() error {

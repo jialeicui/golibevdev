@@ -221,12 +221,12 @@ func NewVirtualGamepad(name string) (uid *UInputDev, err error) {
 		min, max   int32
 		flat, fuzz int32
 	}{
-		{AbsX, -32768, 32767, 128, 16},     // Left stick X
-		{AbsY, -32768, 32767, 128, 16},     // Left stick Y
-		{AbsRx, -32768, 32767, 128, 16},    // Right stick X
-		{AbsRy, -32768, 32767, 128, 16},    // Right stick Y
-		{AbsZ, 0, 255, 0, 0},               // Left trigger
-		{AbsRz, 0, 255, 0, 0},              // Right trigger
+		{AbsX, -32768, 32767, 128, 16},  // Left stick X
+		{AbsY, -32768, 32767, 128, 16},  // Left stick Y
+		{AbsRx, -32768, 32767, 128, 16}, // Right stick X
+		{AbsRy, -32768, 32767, 128, 16}, // Right stick Y
+		{AbsZ, 0, 255, 0, 0},            // Left trigger
+		{AbsRz, 0, 255, 0, 0},           // Right trigger
 	}
 	for _, axis := range absAxes {
 		if err = input.EnableEventCode(EvAbs, axis.code); err != nil {
@@ -275,8 +275,8 @@ func (dev *UInputDev) GetName() string {
 
 // DeviceInfo contains basic information about an input device
 type DeviceInfo struct {
-	Name       string
-	ID         struct{ Vendor, Product, Version, BusType uint16 }
+	Name          string
+	ID            struct{ Vendor, Product, Version, BusType uint16 }
 	DriverVersion int
 }
 
@@ -295,4 +295,8 @@ func (dev *UInputDev) GetDeviceInfo() DeviceInfo {
 // ReadEvent reads the next event from the device
 func (dev *UInputDev) ReadEvent(flag ReadFlag) (Event, error) {
 	return dev.dev.NextEvent(flag)
+}
+
+func (dev *UInputDev) ReadEventWithStatus(flag ReadFlag) (Event, ReadStatus, error) {
+	return dev.dev.NextEventWithStatus(flag)
 }
